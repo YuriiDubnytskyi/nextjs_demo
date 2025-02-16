@@ -5,6 +5,8 @@ import { HomeFilter } from "@/components/filters/HomeFilters";
 import { LocalSearch } from "@/components/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
+import { api } from "@/lib/api";
+import handleError from "@/lib/handlers/error";
 
 const questions = [
   {
@@ -47,12 +49,25 @@ const questions = [
   },
 ];
 
+const test = async () => {
+  try {
+    return await api.users.getAll();
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 interface SearchParams {
   searchParams: Promise<{ [key: string]: string }>;
 }
 
 const Home = async ({ searchParams }: SearchParams) => {
+  const users = await test();
+
+  console.log(users);
+
   const { query = "", filter = "" } = await searchParams;
+
   const filteredQuestions = questions.filter((question) => {
     const matchesQuery = question.title
       .toLowerCase()
@@ -67,6 +82,7 @@ const Home = async ({ searchParams }: SearchParams) => {
     <>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="h1-bold text-dark100_light900">All Questions</h1>
+
         <Button
           className="primary-gradient min-h-[46px] px-4 py-3 !text-light-900"
           asChild
